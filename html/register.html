@@ -1,0 +1,156 @@
+<style>
+    .where {
+        position: absolute;
+        top: 30px;
+        right: calc(50% - 250px);
+    }
+
+    .box {
+        background-color: rgba(214, 255, 255, 0.205);
+
+        width: 500px;
+        height: 530px;
+
+        border-radius: 10px;
+    }
+
+    .input {
+        width: 300px;
+
+        position: relative;
+        top: 10px;
+        margin: 0 auto;
+    }
+
+    .middle_interactive {
+        position: relative;
+        left: 8px;
+
+        color: rgba(244, 255, 254, 0.753);
+    }
+
+    .login {
+        float: right;
+    }
+
+    .interactive {
+        position: relative;
+        top: 45px;
+    }
+</style>
+<script>
+    var url_check = 'http://127.0.0.1:2000/check';
+    var url_sub = 'http://127.0.0.1:3000/register';
+    function Verify() {
+        var pwd_first = $('#pwd_first').val();
+        var pwd_second = $('#pwd_second').val();
+        if (pwd_first != pwd_second) {  //判断两次密码是否输入一致
+            $('#d_second_pwd').addClass('mdui-textfield-invalid');
+        }
+        else {  //下一步判断：判断邮箱是否合法
+            $('#d_second_pwd').removeClass('mdui-textfield-invalid');
+            if (!$('#d_Email').hasClass('mdui-textfield-invalid')) {    //合法执行下一步判断：用户名是否被注册
+                var username = $('#username').val();
+                var pwd = $('#pwd_second').val();
+                var email = $('#Email').val();
+                //查询此用户名是否被注册
+                $.ajax({
+                    type : 'get',
+                    url : url_check,
+                    data : {'username' : username},
+                    success : function(data){
+                        //alert(data.message);
+                        if (data.message == 'ok'){  //未被注册
+                            $('#d_Username').removeClass('mdui-textfield-invalid');
+                            $.ajax({
+                                type : 'post',
+                                url : url_sub,
+                                data : {
+                                    'username' : username,
+                                    'pwd' : pwd,
+                                    'Email' : email,
+                                    'Token' : data.token
+                                },
+                                success : function(data){
+                                    if (data.message == 'ok'){
+                                        //注册成功
+                                        mdui.snackbar({
+                                            message : '注册成功！(￣▽￣)／，我们将会发送一封邮件给您:)',
+                                            position : 'bottom',
+                                        });
+                                    }
+                                    else if (data.message == 'error'){
+                                        //注册失败
+                                        mdui.snackbar({
+                                            message : data.why,
+                                            position : 'bottom',
+                                        });
+                                    }
+                                    else{
+                                        //内部错误
+                                        alert('内部错误！');
+                                    }
+                                },
+                                error : function(){
+                                    alert('服务器错误！')
+                                },
+                            });
+                        }
+                        else if (data.message == 'error'){  //被注册
+                            $('#d_Username').addClass('mdui-textfield-invalid');
+                        }
+                        else{   //异常内部
+                            alert('内部错误！');
+                        };
+                    },
+                    error : function(){
+                        alert('服务器错误！')
+                    },
+                    dataType: 'json',
+                });
+            };
+        };
+    };
+</script>
+<div id="register">
+    <div class="where">
+        <div class="box mdui-shadow-4 mdui-hoverable">
+            <div class="input">
+                <div id="d_Username" class="mdui-textfield mdui-textfield-floating-label">
+                    <i class="mdui-icon material-icons">&#xe853;</i>
+                    <label class="mdui-textfield-label">Username</label>
+                    <input id="username" class="mdui-textfield-input"></input>
+                    <div class="mdui-textfield-error">账户名已被注册</div>
+                </div>
+                <div id="d_Email" class="mdui-textfield mdui-textfield-floating-label">
+                    <i class="mdui-icon material-icons">&#xe0be;</i>
+                    <label class="mdui-textfield-label">Email</label>
+                    <input id="Email" class="mdui-textfield-input" type="email" required />
+                    <div class="mdui-textfield-error">邮箱格式错误</div>
+                </div>
+                <div id="d_first_pwd" class="mdui-textfield mdui-textfield-floating-label">
+                    <i class="mdui-icon material-icons">&#xe897;</i>
+                    <label class="mdui-textfield-label">Password</label>
+                    <input id="pwd_first" class="mdui-textfield-input" type="password"
+                        pattern="^.*(?=.{6,})(?=.*[a-z])(?=.*[0-9]).*$" required />
+                    <div class="mdui-textfield-error">密码至少 6 位，且包含小写字母与任意数字</div>
+                </div>
+                <div id="d_second_pwd" class="mdui-textfield mdui-textfield-floating-label">
+                    <i class="mdui-icon material-icons">&#xe897;</i>
+                    <label class="mdui-textfield-label">VerifyPassword</label>
+                    <input id="pwd_second" class="mdui-textfield-input" type="password" required></input>
+                    <div class="mdui-textfield-error">与第一次输入的密码不一致</div>
+                </div>
+            </div>
+            <div class="middle_interactive input">
+                <div class="login">
+                    <a href="#login" class="mdui-btn mdui-hoverable" onclick="Update_Page('login.html')">Login</a>
+                </div>
+            </div>
+            <div class="interactive input">
+                <button class="mdui-btn mdui-btn-raised mdui-ripple mdui-color-deep-purple" style="width: 100%;"
+                    onclick="Verify()">注册/Register</button>
+            </div>
+        </div>
+    </div>
+</div>
