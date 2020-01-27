@@ -4,12 +4,17 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import socket
-from time import sleep
+import data
+from hashlib import sha256
 from tornado.options import define, options
+
 
 # 绑定地址
 define('port', default=3000, type=int, help='Server Port')
 Disk_addr = ('127.0.0.1', 32648)
+
+# 数据库初始化
+db, cursor = data._init()
 
 
 # 连接disk
@@ -49,20 +54,34 @@ class POSTHandler(BaseHandler):
         username = self.get_argument('username')
         pwd = self.get_argument('pwd')
         Email = self.get_argument('Email')
-        #print('getok')
+        # print('getok')
         state = s_dToken(username, U_Token)
         state = state.decode('utf-8')
-        #print(state)
-        if (state == 'True'):
-            #验证成功，写入数据库
-            #print(username, pwd, Email, U_Token)
-            self.finish({'message':'ok'})
-        elif (state == 'False'):
-            #验证失败，丢弃数据
-            self.finish({'message':'error','why':'Token校验错误！'})
-            U_Token, username, pwd, Email, state = None, None, None, None, None
+        # print(state)
+        if (pwd != None):
+            if (state == 'True'):
+                # 验证成功，写入数据库
+                # 哈希处理密码
+                pwd = sha256(pwd.encode('utf-8')).hexdigest()
+                # print(username, pwd, Email, U_Token)
+                w_state = data.C_user.searchUser(db, cursor, username, pwd, Email, 1)
+                if (w_state == True):
+                    # 写入成功
+                    U_Token, username, pwd, Email, state, w_state = None, None, None, None, None, None
+                    self.finish({'message':'ok'})
+                else:
+                    # 写入失败，内部错误
+                    U_Token, username, pwd, Email, state, w_state = None, None, None, None, None, None
+                    self.finish({'message':'error','why':'内部错误'})
+            elif (state == 'False'):
+                # 验证失败，丢弃数据
+                U_Token, username, pwd, Email, state = None, None, None, None, None
+                self.finish({'message':'error','why':'Token校验错误！'})
+            else:
+                U_Token, username, pwd, Email, state = None, None, None, None, None
+                self.finish({'message':'error','why':'内部错误'})
         else:
-            self.write("内部错误")
+            return False
 
 
 # 主函数

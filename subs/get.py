@@ -5,14 +5,17 @@ import tornado.ioloop
 import tornado.options
 import socket
 import json
+import data
 from tokens import Verify
-from time import sleep
 from tornado.options import define, options
 
 
 # 绑定地址
 define('port', default=2000, type=int, help='Server Port')
 Disk_addr = ('127.0.0.1', 32648)
+
+# 数据库初始化
+db, cursor = data._init()
 
 
 # 连接disk
@@ -49,12 +52,14 @@ class CheckHandler(BaseHandler):
     def get(self):
         checkUsername = self.get_argument('username', None)
         # print(checkUsername)
-        if (checkUsername == 'limo1029a'):
+        state = data.C_user.searchUser(db, cursor, checkUsername, '', '', 2)
+        if (state == 1):
             self.finish({'message': 'error'})
-        elif (checkUsername != 'limo1029a'):
+        elif (state == 0):
             self.finish({'message': 'ok', 'token': g_sToken(checkUsername)})
         else:
             self.finish({'message': 'I_error'})
+        state = None
 
 
 # 定义请求组

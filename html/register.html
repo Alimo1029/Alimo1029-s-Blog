@@ -44,72 +44,78 @@
     function Verify() {
         var pwd_first = $('#pwd_first').val();
         var pwd_second = $('#pwd_second').val();
-        if (pwd_first != pwd_second) {  //判断两次密码是否输入一致
-            $('#d_second_pwd').addClass('mdui-textfield-invalid');
-        }
-        else {  //下一步判断：判断邮箱是否合法
-            $('#d_second_pwd').removeClass('mdui-textfield-invalid');
-            if (!$('#d_Email').hasClass('mdui-textfield-invalid')) {    //合法执行下一步判断：用户名是否被注册
-                var username = $('#username').val();
-                var pwd = $('#pwd_second').val();
-                var email = $('#Email').val();
-                //查询此用户名是否被注册
-                $.ajax({
-                    type : 'get',
-                    url : url_check,
-                    data : {'username' : username},
-                    success : function(data){
-                        //alert(data.message);
-                        if (data.message == 'ok'){  //未被注册
-                            $('#d_Username').removeClass('mdui-textfield-invalid');
-                            $.ajax({
-                                type : 'post',
-                                url : url_sub,
-                                data : {
-                                    'username' : username,
-                                    'pwd' : pwd,
-                                    'Email' : email,
-                                    'Token' : data.token
-                                },
-                                success : function(data){
-                                    if (data.message == 'ok'){
-                                        //注册成功
-                                        mdui.snackbar({
-                                            message : '注册成功！(￣▽￣)／，我们将会发送一封邮件给您:)',
-                                            position : 'bottom',
-                                        });
-                                    }
-                                    else if (data.message == 'error'){
-                                        //注册失败
-                                        mdui.snackbar({
-                                            message : data.why,
-                                            position : 'bottom',
-                                        });
-                                    }
-                                    else{
-                                        //内部错误
-                                        alert('内部错误！');
-                                    }
-                                },
-                                error : function(){
-                                    alert('服务器错误！')
-                                },
-                            });
-                        }
-                        else if (data.message == 'error'){  //被注册
-                            $('#d_Username').addClass('mdui-textfield-invalid');
-                        }
-                        else{   //异常内部
-                            alert('内部错误！');
-                        };
-                    },
-                    error : function(){
-                        alert('服务器错误！')
-                    },
-                    dataType: 'json',
-                });
+        if (pwd_first != '' && pwd_second != '') {
+            $('#d_first_pwd').removeClass('mdui-textfield-invalid');
+            if (pwd_first != pwd_second) {  //判断两次密码是否输入一致
+                $('#d_second_pwd').addClass('mdui-textfield-invalid');
+            }
+            else {  //下一步判断：判断邮箱是否合法
+                $('#d_second_pwd').removeClass('mdui-textfield-invalid');
+                if (!$('#d_Email').hasClass('mdui-textfield-invalid')) {    //合法执行下一步判断：用户名是否被注册
+                    var username = $('#username').val();
+                    var pwd = $('#pwd_second').val();
+                    var email = $('#Email').val();
+                    //查询此用户名是否被注册
+                    $.ajax({
+                        type: 'get',
+                        url: url_check,
+                        data: { 'username': username },
+                        success: function (data) {
+                            //alert(data.message);
+                            if (data.message == 'ok') {  //未被注册
+                                $('#d_Username').removeClass('mdui-textfield-invalid');
+                                $.ajax({
+                                    type: 'post',
+                                    url: url_sub,
+                                    data: {
+                                        'username': username,
+                                        'pwd': pwd,
+                                        'Email': email,
+                                        'Token': data.token
+                                    },
+                                    success: function (data) {
+                                        if (data.message == 'ok') {
+                                            //注册成功
+                                            mdui.snackbar({
+                                                message: '注册成功！(￣▽￣)／，我们将会发送一封邮件给您:)',
+                                                position: 'bottom',
+                                            });
+                                        }
+                                        else if (data.message == 'error') {
+                                            //注册失败
+                                            mdui.snackbar({
+                                                message: data.why,
+                                                position: 'bottom',
+                                            });
+                                        }
+                                        else {
+                                            //内部错误
+                                            alert('内部错误！');
+                                        }
+                                    },
+                                    error: function () {
+                                        alert('服务器错误！')
+                                    },
+                                });
+                            }
+                            else if (data.message == 'error') {  //被注册
+                                $('#d_Username').addClass('mdui-textfield-invalid');
+                            }
+                            else {   //异常内部
+                                alert('内部错误！');
+                            };
+                        },
+                        error: function () {
+                            alert('服务器错误！')
+                        },
+                        dataType: 'json',
+                    });
+                };
             };
-        };
+        }
+        else{
+            $('#d_first_pwd').addClass('mdui-textfield-invalid');
+        }
     };
 </script>
 <div id="register">
@@ -119,7 +125,7 @@
                 <div id="d_Username" class="mdui-textfield mdui-textfield-floating-label">
                     <i class="mdui-icon material-icons">&#xe853;</i>
                     <label class="mdui-textfield-label">Username</label>
-                    <input id="username" class="mdui-textfield-input"></input>
+                    <input id="username" class="mdui-textfield-input" type="text" required></input>
                     <div class="mdui-textfield-error">账户名已被注册</div>
                 </div>
                 <div id="d_Email" class="mdui-textfield mdui-textfield-floating-label">
