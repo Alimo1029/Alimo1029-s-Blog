@@ -24,11 +24,14 @@ CREATE TABLE `users` (
   `ID` int NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `username` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '用户名-明文',
   `password` tinytext CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '密码-sha256',
-  `mail` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '邮箱-明文',
+  `Email` text CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '邮箱-明文',
+  PRIMARY KEY (`ID`),
   UNIQUE KEY `ID` (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8;
 
 /*Data for the table `users` */
+
+insert  into `users`(`ID`,`username`,`password`,`Email`) values (1,'limo1029','09bdc8e07b59c2f7601f8edd0c527c124227098a5078867d4ca309be2fceedd7','1282160815@qq.com');
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

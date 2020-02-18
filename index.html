@@ -7,15 +7,28 @@
     <link rel="stylesheet" href="css/mdui.min.css">
     <script src="js/mdui.min.js"></script>
     <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/sha256.js"></script>
 </head>
 
 <script>
     $(document).ready(function () {
-        Update_Page('index.html');
+        Update_Page('index.html', false);
+        var urlpath = window.location.href
+        var isAdmin = false;
+        var how = urlpath.split('?')[1]
+        if (how == 'how=admin'){
+            isAdmin = true
+            Update_Page('index.html', true);
+        }
     });
 
-    function Update_Page(what_Page) {
-        G_url = './html/' + what_Page;
+    function Update_Page(what_Page, isAdmin) {
+        if (isAdmin == false){
+            G_url = './html/' + what_Page;
+        }
+        else if (isAdmin == true){
+            G_url = './admin/' + what_Page;
+        }
         $.ajax({
             url: G_url,
             success: function (date) {
@@ -66,12 +79,17 @@
     <div class="mdui-appbar mdui-appbar-fixed">
         <div class="mdui-toolbar mdui-color-deep-purple">
             <a href="javascript:;" class="mdui-btn mdui-btn-icon"><i class="mdui-icon material-icons">menu</i></a>
-            <a href="javascript:;" class="mdui-typo-title">Alimo1029's Blog</a>
+            <a id="applyTitle" href="javascript:;" class="mdui-typo-title">Alimo1029's Blogs - Guest</a>
             <div class="mdui-toolbar-spacer"></div>
-            <a href="#login" class="mdui-btn mdui-btn-icon" onclick="Update_Page('login.html')"><i
-                    class="mdui-icon material-icons">&#xe853;</i></a>
-            <a class="mdui-btn mdui-btn-icon" mdui-menu="{target: '#more_vert'}"><i
-                    class="mdui-icon material-icons">&#xe5d4;</i></a>
+            <div id="handleUser">
+                <a href="#login" class="mdui-btn mdui-btn-icon" onclick="Update_Page('login.html', false)">
+                    <i class="mdui-icon material-icons" mdui-tooltip="{content: '登录', delay: 400}">&#xe853;</i>
+                    <!--<i class='mdui-icon'><img src='users/limo1029/headimg/headimg.jpg' /></i>-->
+                </a>
+            </div>
+            <a class="mdui-btn mdui-btn-icon" mdui-menu="{target: '#more_vert'}">
+                <i class="mdui-icon material-icons">&#xe5d4;</i>
+            </a>
             <ul class="mdui-menu mdui-menu-cascade" id="more_vert">
                 <li class="mdui-menu-item">
                     <a href="javascript:;" class="mdui-ripple">关于</a>
@@ -82,11 +100,11 @@
             </ul>
         </div>
         <div class="mdui-tab mdui-color-deep-purple" mdui-tab>
-            <a href="#index" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('index.html')">首页</a>
-            <a href="#dynamic" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('dynamic.html')">动态</a>
-            <a href="#friends" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('friends.html')">友情♂链接</a>
-            <a href="#dry_object" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('dryObject.html')">干货</a>
-            <a href="#about" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('about.html')">关于</a>
+            <a href="#index" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('index.html', false)">首页</a>
+            <a href="#dynamic" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('dynamic.html', false)">动态</a>
+            <a href="#friends" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('friends.html', false)">友情♂链接</a>
+            <a href="#dry_object" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('dryObject.html', false)">干货</a>
+            <a href="#about" class="mdui-ripple mdui-ripple-white" onclick="Update_Page('about.html', false)">关于</a>
         </div>
     </div>
     <!--顶部工具栏 --- 结束-->
@@ -95,7 +113,7 @@
     <div id="MainPageContext" class="mdui-container-flui">
         <div style="background-color: rgba(0, 0, 0, 0.267); width: 100%; height: 100%;">
             <!--非固定页面内容 --- 开始-->
-            <div id="PageContext">
+            <div id="PageContext" style="overflow-y: auto; overflow-x: hidden;">
 
             </div>
             <!--非固定页面内容 --- 结束-->
